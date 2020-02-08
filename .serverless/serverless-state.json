@@ -9,7 +9,7 @@
       "variableSyntax": "\\${([ ~:a-zA-Z0-9._@'\",\\-\\/\\(\\)*?]+?)}",
       "name": "aws",
       "runtime": "python3.6",
-      "region": "ap-northeast-1",
+      "region": "us-east-1",
       "versionFunctions": true,
       "remoteFunctionData": null,
       "compiledCloudFormationTemplate": {
@@ -160,7 +160,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/serverless-flask/dev/1581131657920-2020-02-08T03:14:17.920Z/serverless-flask.zip"
+                "S3Key": "serverless/serverless-flask/dev/1581139592966-2020-02-08T05:26:32.966Z/serverless-flask.zip"
               },
               "FunctionName": "serverless-flask-dev-app",
               "Handler": "wsgi_handler.handler",
@@ -179,14 +179,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "AppLambdaVersionIqyvyogg3ozkoKjOfQcy8NtxzyiLaRg9dJ8GjfapEC0": {
+          "AppLambdaVersioncum5ri9UYSE9vvUVGXk8pvyEAzj3fowlASwNt9sHnI": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "AppLambdaFunction"
               },
-              "CodeSha256": "IJGK4XqmDP60wEqbvG5sz+XO/Y7pcYxRons7rWTl0Lw="
+              "CodeSha256": "NeakWO6STaHeBbOQXd9gSiDyVe/3n0aXYYSZKGOjVcw="
             }
           },
           "ApiGatewayRestApi": {
@@ -201,7 +201,7 @@
               "Policy": ""
             }
           },
-          "ApiGatewayResourceGreet": {
+          "ApiGatewayResourceProxyVar": {
             "Type": "AWS::ApiGateway::Resource",
             "Properties": {
               "ParentId": {
@@ -210,19 +210,22 @@
                   "RootResourceId"
                 ]
               },
-              "PathPart": "greet",
+              "PathPart": "{proxy+}",
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
             }
           },
-          "ApiGatewayMethodGreetGet": {
+          "ApiGatewayMethodAny": {
             "Type": "AWS::ApiGateway::Method",
             "Properties": {
-              "HttpMethod": "GET",
+              "HttpMethod": "ANY",
               "RequestParameters": {},
               "ResourceId": {
-                "Ref": "ApiGatewayResourceGreet"
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
               },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
@@ -259,7 +262,50 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1581131635097": {
+          "ApiGatewayMethodProxyVarAny": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "ANY",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceProxyVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "AppLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayDeployment1581139562696": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -268,7 +314,8 @@
               "StageName": "dev"
             },
             "DependsOn": [
-              "ApiGatewayMethodGreetGet"
+              "ApiGatewayMethodAny",
+              "ApiGatewayMethodProxyVarAny"
             ]
           },
           "AppLambdaPermissionApiGateway": {
@@ -318,7 +365,7 @@
           "AppLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "AppLambdaVersionIqyvyogg3ozkoKjOfQcy8NtxzyiLaRg9dJ8GjfapEC0"
+              "Ref": "AppLambdaVersioncum5ri9UYSE9vvUVGXk8pvyEAzj3fowlASwNt9sHnI"
             }
           },
           "ServiceEndpoint": {
@@ -434,7 +481,10 @@
         "handler": "wsgi_handler.handler",
         "events": [
           {
-            "http": "GET greet"
+            "http": "ANY /"
+          },
+          {
+            "http": "ANY {proxy+}"
           }
         ],
         "name": "serverless-flask-dev-app",
@@ -443,7 +493,7 @@
         "timeout": 6,
         "runtime": "python3.6",
         "vpc": {},
-        "versionLogicalId": "AppLambdaVersionIqyvyogg3ozkoKjOfQcy8NtxzyiLaRg9dJ8GjfapEC0"
+        "versionLogicalId": "AppLambdaVersioncum5ri9UYSE9vvUVGXk8pvyEAzj3fowlASwNt9sHnI"
       }
     },
     "serviceFilename": "serverless.yml",
@@ -452,7 +502,7 @@
     "artifact": "/Users/ryoma/projects3/todo-list/.serverless/serverless-flask.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/serverless-flask/dev/1581131657920-2020-02-08T03:14:17.920Z",
+    "artifactDirectoryName": "serverless/serverless-flask/dev/1581139592966-2020-02-08T05:26:32.966Z",
     "artifact": "serverless-flask.zip"
   }
 }

@@ -1,3 +1,6 @@
+org: tanakaryoma1992
+# serverless.yml
+
 service: serverless-flask
 
 plugins:
@@ -6,7 +9,7 @@ plugins:
 
 custom:
   wsgi:
-    app: app.app
+app: serverless-flask-app
     packRequirements: false
   pythonRequirements:
     dockerizePip: non-linux
@@ -15,10 +18,11 @@ provider:
   name: aws
   runtime: python3.6
   stage: dev
-  region: ap-northeast-1
+  region: us-east-1
 
 functions:
   app:
     handler: wsgi.handler
     events:
-      - http: GET greet
+      - http: ANY /
+      - http: 'ANY {proxy+}'
